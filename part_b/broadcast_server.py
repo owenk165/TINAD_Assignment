@@ -2,7 +2,7 @@
 #                                                                           #
 # Student: Khew Li Tien 1704367                                             #
 # UEEN3123: TCP/IP Network Application Development [MAY 2021]               #
-# Part B: Develop a broadcast application to disemminate earthquake         #
+# Part B: Develop a broadcast application to disseminate earthquake         #
 # and tsunami warning information to all clients on the subnet as follows.  #
 # Broadcast server                                                          #
 #                                                                           #
@@ -10,19 +10,16 @@
 
 import socket
 import time
+from datetime import datetime
 import re
+import json
 
 port = 8888
 sender_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sender_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-# a) Date & Time of Occurrence
-# b) Type (Earthquake / Tsunami Warning)
-# c) Location
-# d) Description
-# Continuously check for input while the server is up
-
-def customGetDate():
+# Custom function to get date with correct format
+def custom_get_date():
     errorFlag = True
     inputDate = 0
     while errorFlag:
@@ -34,7 +31,9 @@ def customGetDate():
             print("Incorrect format")
     return inputDate
 
-def customGetTime():
+
+# Custom function to get time with correct format
+def custom_get_time():
     errorFlag = True
     inputTime = 0
     while errorFlag:
@@ -46,16 +45,40 @@ def customGetTime():
             print("Incorrect format")
     return inputTime
 
-while True:
-    # response = str(datetime.now())
-    inputDate = customGetDate()
-    print(inputDate)
-    # [-] No need to convert input date to datetime object
-    # formattedDate = datetime.strptime(inputDate, "%d/%m/%Y")
-    inputTime = customGetTime()
-    print(inputTime)
 
-    sender_socket.sendto(inputDate.encode(), ('<broadcast>', port))
+# Custom function to get the incident type 1 or 2
+def custom_get_incident_type():
+    errorFlag = True
+    inputType = 0
+    while errorFlag:
+        try:
+            inputType = str(input("Type of incident [0 - Earthquake warning] [1 - Tsunami warning]: "))
+            regexCheck = re.match("^[0-1]$", inputType)
+            errorFlag = not regexCheck
+            inputType = "Tsunami warning" if int(inputType) == 1 else "Earthquake warning"
+        except:
+            print("Incorrect format")
+    return inputType
+
+while True:
+    inputDate = custom_get_date()
+    inputTime = custom_get_time()
+    formattedDateTime = inputDate + " " + inputTime + "hour"
+    inputIncidentType = custom_get_incident_type()
+    inputLocation = str(input("Enter the location of incident: "))
+    inputDescription = str(input("Provide some description for the incident: "))
+
+    currentTime = str(datetime.now())
+
+    JSONData = {
+        "incidentDatetime": formattedDateTime,
+        "incidentType": inputIncidentType,
+        "incidentLocation": inputLocation,
+        "incidentDescription": inputDescription,
+        "incidentGenerated": currentTime
+    }
+
+    sender_socket.sendto(json.dumps(JSONData).encode(), ('<broadcast>', port))
     print('[+]Broadcasted data to UDP port {}'.format(port))
 
-    time.sleep(3)
+    time.sleep(2)

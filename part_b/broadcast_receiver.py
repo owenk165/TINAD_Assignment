@@ -8,15 +8,17 @@
 #                                                                           #
 #############################################################################
 import socket
+import json
 
 PORT = 8888
 
 receiver_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# Reuse previous address, 1 to active, 0 to deactivate
 receiver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 receiver_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 receiver_socket.bind(('', PORT))
 
 while True:
     data, addr = receiver_socket.recvfrom(1024)
-    print('Received from {}; Server Time: {}'.format(addr, data.decode()))
+    data_as_object = json.loads(data.decode())
+    data_formatted = json.dumps(data_as_object, indent=2)
+    print('Received from {}; Data: {}'.format(addr, data_formatted))
