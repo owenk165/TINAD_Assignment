@@ -18,6 +18,7 @@ port = 8888
 sender_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sender_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
+
 # Custom function to get date with correct format
 def custom_get_date():
     errorFlag = True
@@ -27,6 +28,7 @@ def custom_get_date():
             inputDate = str(input("Date of incident occurrence (Format DD/MM/YYYY): "))
             regexCheck = re.match("^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/][0-9]{1,4}\d\d$", inputDate)
             errorFlag = not regexCheck
+            print("Incorrect format") if errorFlag else None
         except:
             print("Incorrect format")
     return inputDate
@@ -41,6 +43,7 @@ def custom_get_time():
             inputTime = str(input("Time of incident occurrence (Format HHMM): "))
             regexCheck = re.match("^([0-1][0-9]|2[0-3])([0-5][0-9])$", inputTime)
             errorFlag = not regexCheck
+            print("Incorrect format") if errorFlag else None
         except:
             print("Incorrect format")
     return inputTime
@@ -56,6 +59,7 @@ def custom_get_incident_type():
             regexCheck = re.match("^[0-1]$", inputType)
             errorFlag = not regexCheck
             inputType = "Tsunami warning" if int(inputType) == 1 else "Earthquake warning"
+            print("Incorrect format") if errorFlag else None
         except:
             print("Incorrect format")
     return inputType
@@ -79,6 +83,6 @@ while True:
     }
 
     sender_socket.sendto(json.dumps(JSONData).encode(), ('<broadcast>', port))
-    print('[+]Broadcasted data to UDP port {}'.format(port))
+    print('[+] Broadcasted data to UDP port {}'.format(port))
 
     time.sleep(2)

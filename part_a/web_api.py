@@ -1,3 +1,12 @@
+#############################################################################
+#                                                                           #
+# Student: Khew Li Tien 1704367                                             #
+# UEEN3123: TCP/IP Network Application Development [MAY 2021]               #
+# Part A: Develop a Web API using Flask for the staff to maintain           #
+# information about transit stations of the MRT Sungai Buloh - Kajang line  #
+# Note: localhost:8888                                                      #
+#                                                                           #
+#############################################################################
 import sqlite3
 import json
 from flask import Flask, jsonify, request, abort
@@ -12,7 +21,7 @@ app = Flask(__name__)
 # 5. DELETE /api/stations/<int:id>
 
 
-def get_row_as_dict(row):
+def Get_row_as_dict(row):
     row_dict = {
     'ID': row[0],
     'CODE': row[1],
@@ -23,14 +32,14 @@ def get_row_as_dict(row):
 
 
 @app.route('/')
-def index():
+def Index():
     return '<h1>This is the index page for UECS3123 assignment</h1>'
 
 
 # 1. GET /api/stations
 @app.route('/api/stations', methods=['GET'])
-def getAllStations():
-    # Adaptive JSON conversion, inspired from https://stackoverflow.com/a/18054751
+def GetAllStations():
+    # Adaptive JSON conversion, inspired and modified from https://stackoverflow.com/a/18054751
     try:
         dbConnection = sqlite3.connect('../database/1704367_UECS3123_Assignment_May2021.sqlite')
         dbConnection.row_factory = sqlite3.Row
@@ -56,14 +65,14 @@ def getAllStations():
     # rows_as_dict = []
     # db.close()
     # for row in rows:
-    #     row_as_dict = get_row_as_dict(row)
+    #     row_as_dict = Get_row_as_dict(row)
     #     rows_as_dict.append(row_as_dict)
     # return jsonify(rows_as_dict), 200
 
 
 # 2. GET /api/stations/<int:id>
 @app.route('/api/stations/<int:id>', methods=['GET'])
-def getStation(id):
+def GetStation(id):
     try:
         dbConnection = sqlite3.connect('../database/1704367_UECS3123_Assignment_May2021.sqlite')
         dbConnection.row_factory = sqlite3.Row
@@ -79,9 +88,9 @@ def getStation(id):
 
 
 # 3. POST /api/stations
-# Insert?
+# Insert
 @app.route('/api/stations', methods=['POST'])
-def insertNewStation():
+def InsertNewStation():
     if not request.json:
         abort(404)
 
@@ -110,8 +119,9 @@ def insertNewStation():
 
 
 # 4. PUT /api/stations/<int:id>
+# ID must be in both http address and JSON
 @app.route('/api/stations/<int:id>', methods=['PUT'])
-def updateStation(id):
+def UpdateStation(id):
     if not request.json:
         print("REQUEST IS EMPTY")
         abort(400)
@@ -149,7 +159,7 @@ def updateStation(id):
 
 # 5. DELETE /api/stations/<int:id>
 @app.route('/api/stations/<int:id>', methods=['DELETE'])
-def deleteStation(id):
+def DeleteStation(id):
     if not request.json:
         abort(400)
 
@@ -176,4 +186,4 @@ def deleteStation(id):
 
 
 if __name__=='__main__':
-        app.run(debug=True)
+        app.run(debug=True, port=8888)
