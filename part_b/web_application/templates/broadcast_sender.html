@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='sender.css') }}">
+        <script>
+            function createWarning(data) {
+                    var type = data.incidentType;
+                    var cardMain = document.createElement("div");
+                    cardMain.className = "cardMain";
+
+                    var cardImg = document.createElement("div");
+                    cardImg.className = "cardImg";
+                    var selectedImg = document.createElement("img");
+                    if (type.toUpperCase() == "EARTHQUAKE") {
+                        selectedImg.src = '../static/images/earthquake-64.png';
+                    }
+                    else if (type.toUpperCase() == "TSUNAMI") {
+                        selectedImg.src = '../static/images/tsunami-64.png';
+                    }
+                    else {
+                        selectedImg.src = '../static/images/warning-64.png';
+                    }
+                    cardImg.appendChild(selectedImg);
+
+                    var cardDetails = document.createElement("div");
+                    cardDetails.className = "cardDetails";
+                    cardDetails.appendChild(document.createElement("h1").appendChild(document.createTextNode(data.incidentType)).parentNode);
+                    cardDetails.appendChild(document.createElement("h2").appendChild(document.createTextNode('Time: '+data.incidentTime)).parentNode);
+                    cardDetails.appendChild(document.createElement("h2").appendChild(document.createTextNode('Location: '+data.incidentLocation)).parentNode);
+                    cardDetails.appendChild(document.createElement("h2").appendChild(document.createTextNode('Description:')).parentNode);
+                    cardDetails.appendChild(document.createElement("h2").appendChild(document.createTextNode(data.incidentDescription)).parentNode);
+                    cardDetails.appendChild(document.createElement("h3").appendChild(document.createTextNode('Issued on '+data.incidentGenerated)).parentNode);
+
+                    cardMain.appendChild(cardImg);
+                    cardMain.appendChild(cardDetails);
+                    document.getElementById('receiver').appendChild(cardMain);
+                }
+        </script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+        <script>
+            var socket = io.connect('http://localhost:5000/signal', { secure: false });
+            socket.on('connect', function () {
+                // we emit a connected message to let the client know that we are connected.
+                socket.emit('client_connected', { 'connected': true });
+                console.log('Connected to WebSocket server');
+                var connection = document.getElementById('connection');
+                connection.className ="connected"
+                connection.innerHTML="Connected"
+                connection.title="The application is connected to the server"
+            });
+
+            socket.on('message_broadcast', function (data) {
+                let messageBag = JSON.parse(data);
+                createWarning(messageBag);
+            });
+        </script>
+        <script>
+            function send() {
+                    let time = document.getElementById('time').value;
+                    let type = document.getElementById('type').value;
+                    let location = document.getElementById('location').value;
+                    let description = document.getElementById('description').value;
+
+                    let data = {
+                        incidentTime: time,
+                        incidentType: type,
+                        incidentLocation: location,
+                        incidentDescription: description,
+                    };
+                    socket.emit('message_sent', data);
+                    console.log('Client sent data to WebSocket server: ', data);
+                }
+        </script>
+    </head>
+
+    <body>
+        <div class='body'>
+            <div class='hero'>
+                <div class="heroContainer">
+                    <h1>
+                        Emergency Broadcasting Application
+                    </h1>
+                    <h3>
+                        Get notified of the latest Earthquake or Tsunami warnings
+                    </h3>
+                    <div id="connection" class="notConnected" title="The application cannot connect to the server">Not connected</div>
+                </div>
+            </div>
+    
+            <div class='Container'>
+                <div id="receiver" class="receiver">
+                    <h1>
+                        Latest warning
+                    </h1>
+                </div>
+    
+                <div class="lineBreak"></div>
+    
+                <div style="display:flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <h1>
+                        Send a new warning
+                    </h1>
+                    <div class="sendContainer" >
+                        <form style="display:flex; flex-direction: column">
+                            <table>
+                                <tr>
+                                    <td><label>Time of incident</label></td>
+                                    <td><input type="text" id="time" name="time"></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Type of incident</label></td>
+                                    <td><select id="type" name="type">
+                                    <option value="Earthquake">Earthquake</option>
+                                    <option value="Tsunami">Tsunami</option></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Location of incident</label></td>
+                                    <td><input type="text" id="location" name="location"></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Incident description</label></td>
+                                    <td><textarea id="description" name="description"></textarea></td>
+                                </tr>
+                            </table>
+                            <button type="button" class="button" onClick="send()">Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="bottomText">
+            <h1>Start spreading the news!</h1>
+            <h2>Your voices can save lives</h2>
+            <img src="../static/images/phone.png">
+            <h3>© Created by Khew Li Tien (1704367) for May 2021 UECS3123 Assignment</h3>
+        </div>
+    </body>
+</html>

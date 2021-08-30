@@ -1,0 +1,3 @@
+Earthquake icon retrieved from: https://www.flaticon.com/free-icon/earthquake_645629
+Tsunami icon retrieved from: https://www.flaticon.com/free-icon/tsunami_1409701
+Warning icon retrieved from: https://www.flaticon.com/free-icon/warning-sign_3959661
