@@ -259,3 +259,7 @@ transform: translate(0, -3px);
     color:#525864;
     font-family: 'Roboto', sans-serif;
 }
+
+body{
+    margin:0;
+}
